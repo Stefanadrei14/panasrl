@@ -1,0 +1,101 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import emailjs from "@emailjs/browser";
+
+const discountCodes = {
+  "Cioara": 20,
+  "Lebron James": 15,
+  "cdlp": 10,
+};
+
+export default function ChimieCuPana() {
+  const [nume, setNume] = useState("");
+  const [email, setEmail] = useState("");
+  const [cod, setCod] = useState("");
+  const [confirmare, setConfirmare] = useState("");
+
+  const handleRezervare = () => {
+    let reducere = discountCodes[cod] || 0;
+    const mesaj = `Nume: ${nume}\nEmail: ${email}\nCod reducere: ${cod}`;
+
+    emailjs.send("Gmail_pana", "template_88t3gbl", {
+      nume,
+      email,
+      cod,
+      message: mesaj,
+    }, "L7Fa4SGy8Bc34Txnp")
+    .then(() => {
+      setConfirmare(
+        `Salut, ${nume}! Rezervarea ta a fost înregistrată${reducere ? ` cu o reducere de ${reducere}%` : ""}. Vei primi un email la ${email}.`
+      );
+    })
+    .catch((error) => {
+      console.error("Eroare trimitere email:", error);
+      setConfirmare("A apărut o eroare la rezervare. Încearcă din nou mai târziu.");
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-700 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-xl w-full"
+      >
+        <Card className="rounded-2xl shadow-xl p-6 text-white">
+          <CardContent>
+            <h1 className="text-4xl font-bold mb-4 text-center">Învăță Chimie cu Pana</h1>
+
+            <div className="mb-6 bg-white text-black p-4 rounded-xl">
+              <h2 className="text-xl font-semibold mb-2">🧪 Prețuri</h2>
+              <ul className="space-y-1">
+                <li>• 1 sesiune individuală – <strong>5 RON</strong></li>
+                <li>• Primirea fișei de recapitulare – <strong>3 RON</strong></li>
+              </ul>
+            </div>
+
+            <div className="space-y-4">
+              <Input
+                placeholder="Numele tău"
+                value={nume}
+                onChange={(e) => setNume(e.target.value)}
+              />
+              <Input
+                type="email"
+                placeholder="Emailul tău"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                placeholder="Cod de reducere (opțional)"
+                value={cod}
+                onChange={(e) => setCod(e.target.value)}
+              />
+              <Button className="w-full" onClick={handleRezervare}>
+                Rezervă o sesiune
+              </Button>
+              {confirmare && (
+                <p className="mt-4 bg-white text-black rounded-xl p-4 text-center">
+                  {confirmare}
+                </p>
+              )}
+            </div>
+            <div className="mt-6 bg-white text-black p-4 rounded-xl">
+              <h2 className="text-xl font-semibold mb-2">🕒 Disponibilitate</h2>
+              <ul className="space-y-1">
+                <li>• Luni: indisponibil toată ziua</li>
+                <li>• Sâmbăta: indisponibil toată ziua</li>
+                <li>• Duminica: disponibil după ora 16:00</li>
+                <li>• Zilele lucrătoare (marți-vineri): disponibil între orele 14:00 și 20:00</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
